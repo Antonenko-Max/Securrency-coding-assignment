@@ -1,7 +1,7 @@
 Transaction Discovery Service (TDS)
 
 
-We need to build an application written on C# (.NET Core) which discovers wallet transactions. 
+We need to build an distributed application written on C# (.NET Core) which discovers wallet transactions. 
 You can implement interaction with API in the way that is the most convenient for you (Blazor, Console, Postman, etc). 
 The application should be written as production-ready.
 Create as many services as you think are appropriate.
