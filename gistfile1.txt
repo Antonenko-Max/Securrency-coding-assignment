@@ -16,6 +16,10 @@ This endpoint starts to discover all the payment transactions associated with th
 TDS calls Stellar ledger to get transactions and persists them into the database.
 Every wallet may be discovered several times. All new transactions should be recognized and persisted. 
 
+
+*********************************
+**** OPTIONAL PART ****
+
 TDS API exposes the REST endpoint to download CSV report for a provided wallet address.
 The report should contain the transfer history with aggregated transferred amount grouped by source/destination wallet address.
 
@@ -34,7 +38,7 @@ W1 received from W2: 5 XLM
 the report generated for W1 should be as follows:
 W2,5
 W3,10
---------------------------------------------
+***************************************************
 
 Test wallets: 
 GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT
