@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <TreatWarsningsAsErrors>true</TreatWarsningsAsErrors>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <MinClientVersion>2.12</MinClientVersion>
+    <Title>Securrency.TDS.WebClient</Title>
+    <Description>blanc.</Description>
+    <Summary>blanc.</Summary>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <PackageTags>WebClient</PackageTags>
+    <PackageLicenseExpression>UNLICENSED</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl> 
+    <Authors>EPAM Systems</Authors>
+    <Copyright>2020 EPAM Systems</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0-preview.3.21201.4" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Securrency.TDS.Web\Securrency.TDS.Web.csproj" />
+  </ItemGroup>
+
+</Project>

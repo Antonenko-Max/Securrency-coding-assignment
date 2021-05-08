@@ -1,0 +1,15 @@
+version: '3.0'
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-GA-ubuntu-16.04
+    command: '/var/opt/mssql-init/start-server.sh'
+    environment:
+      ACCEPT_EULA: y
+      MSSQL_SA_PASSWORD: 1QAZ2wsx3EDC
+    ports:
+      - '1433:1433'
+    volumes:
+      - '.mssql\init:/var/opt/mssql-init:ro'
+      - '.mssql\db\data:/var/opt/mssql/data'
+      - '.mssql\db\log:/var/opt/mssql/log'
+      - '.mssql\db\secrets:/var/opt/mssql/secrets'
