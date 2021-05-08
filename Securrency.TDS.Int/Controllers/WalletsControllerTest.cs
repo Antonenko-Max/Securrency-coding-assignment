@@ -42,7 +42,7 @@ namespace Securrency.TDS.Int.Controllers
             };
 
             //Act
-            await _tdsClient.UploadWallets(wallets, CancellationToken.None);
+            await _tdsClient.UploadWalletsAsync(wallets, CancellationToken.None);
 
             //Assert
             using AppDbContext ctx2 = Db.GetAdminContext();
@@ -76,7 +76,7 @@ namespace Securrency.TDS.Int.Controllers
 
             //Act
             var ex = Assert.ThrowsAsync<TdsClientException>(() =>
-                _tdsClient.UploadWallets(wallets, CancellationToken.None));
+                _tdsClient.UploadWalletsAsync(wallets, CancellationToken.None));
             
             //Assert
             Assert.AreEqual(HttpStatusCode.BadRequest, ex!.Details.StatusCode);
@@ -94,10 +94,62 @@ namespace Securrency.TDS.Int.Controllers
 
             //Act
             var ex = Assert.ThrowsAsync<TdsClientException>(() =>
-                _tdsClient.UploadWallets(wallets, CancellationToken.None));
+                _tdsClient.UploadWalletsAsync(wallets, CancellationToken.None));
             
             //Assert
             Assert.AreEqual(HttpStatusCode.BadRequest, ex!.Details.StatusCode);
+        }
+
+        [Test]
+        public async Task Test_GetReportAsync_Functional()
+        {
+            var accountId = "GCYY337UP2VNQTJ4AZTO2K54HK5V5RARB6BDFQXLFVZMEKFPTZTWBJQP";
+            //Arrange
+            var payments = new PaymentEntity[]
+            {
+                new() {Id = 1, SourceAccountId = "1", TransactionSuccessful = true, From = accountId, To = "1", Amount = 10},
+                new() {Id = 2, SourceAccountId = "1", TransactionSuccessful = true, From = "1", To = accountId, Amount = 15},
+                new() {Id = 3, SourceAccountId = "3", TransactionSuccessful = true, From = "3", To = accountId, Amount = 5.01m},
+            };
+            using (AppDbContext ctx1 = Db.GetAdminContext())
+            {
+                ctx1.Set<PaymentEntity>().AddRange(payments);
+                await ctx1.SaveChangesAsync();
+            }
+
+            //Act
+            string result = await _tdsClient.DownloadReportAsync(accountId, CancellationToken.None);
+
+            //Assert
+            Assert.AreEqual("1,5\r\n3,5.01\r\n", result);
+        }
+
+        [Test]
+        public void Test_GetReportAsync_Returns_Bad_Request_If_AccoundId_Invalid()
+        {
+            var accountId = "GCYY337UP2VNQTJ4AZTO2K54HK5V5RARB6BDFQXLFVZMEKFPTZTWBJQP__";
+            //Arrange
+
+            //Act
+            var ex = Assert.ThrowsAsync<TdsClientException>(() =>
+                _tdsClient.DownloadReportAsync(accountId, CancellationToken.None));
+
+            //Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, ex!.Details.StatusCode);
+        }
+
+        [Test]
+        public void Test_GetReportAsync_Returns_NotFound_If_Report_Empty()
+        {
+            var accountId = "GCYY337UP2VNQTJ4AZTO2K54HK5V5RARB6BDFQXLFVZMEKFPTZTWBJQP";
+            //Arrange
+
+            //Act
+            var ex = Assert.ThrowsAsync<TdsClientException>(() =>
+                _tdsClient.DownloadReportAsync(accountId, CancellationToken.None));
+
+            //Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, ex!.Details.StatusCode);
         }
     }
 }

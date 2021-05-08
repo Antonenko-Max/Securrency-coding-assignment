@@ -6,6 +6,8 @@ namespace Securrency.TDS.WebClient
 {
     public interface ITdsClient
     {
-        Task UploadWallets(WalletPostModel[] wallets, CancellationToken ct);
+        Task UploadWalletsAsync(WalletPostModel[] wallets, CancellationToken ct);
+
+        Task<string> DownloadReportAsync(string accountId, CancellationToken ct);
     }
 }

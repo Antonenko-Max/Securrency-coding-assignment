@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Securrency.TDS.Web.Services.PaymentService;
+using Securrency.TDS.Web.Services.ReportService;
 
 namespace Securrency.TDS.Web.Controllers
 {
@@ -14,13 +16,16 @@ namespace Securrency.TDS.Web.Controllers
     {
         private readonly IPaymentService _paymentService;
         private readonly ILogger _logger;
+        private readonly IReportService _reportService;
 
         public WalletsController(
             IPaymentService paymentService, 
-            ILogger<WalletsController> logger)
+            ILogger<WalletsController> logger, 
+            IReportService reportService)
         {
             _paymentService = paymentService;
             _logger = logger;
+            _reportService = reportService;
         }
         
         /// <summary>
@@ -46,5 +51,31 @@ namespace Securrency.TDS.Web.Controllers
                 return ValidationProblem(e.Message);
             }
         }
+
+        /// <summary>
+        /// Download a csv report for the wallet
+        /// </summary>
+        /// <param name="accountId">the wallet account Id</param>
+        /// <param name="ct">Cancellation token</param>
+        [HttpGet("report/{accountId}")]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetReportAsync(string accountId, CancellationToken ct)
+        {
+            if (accountId.Length != 56) return ValidationProblem("Invalid account Id length");
+
+            _logger.LogDebug("Generating a csv report for wallet: {0}", accountId);
+
+            WalletReportLine[] report = await _reportService.GenerateReportAsync(accountId, ct);
+
+            if (!report.Any()) return NotFound();
+
+            _logger.LogDebug("The csv report generated");
+
+            Response.Headers["Content-Disposition"] = "attachment";
+            return File(report.ToCsvReport(), "text/csv", "report.csv");
+        }
+
     }
 }
