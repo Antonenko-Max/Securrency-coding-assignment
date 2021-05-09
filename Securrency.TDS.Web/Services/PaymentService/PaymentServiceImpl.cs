@@ -60,15 +60,13 @@ namespace Securrency.TDS.Web.Services.PaymentService
             using TransactionScope tran = Tran.BeginScope(IsolationLevel.Serializable);
             using AppDbContext ctx = _dbContextFactory.CreateContext();
 
-            string range = string.Join(", ",payments.Select(p => p.Id));
+            IEnumerable<long> range = payments.Select(p => p.Id);
 
             _logger.LogDebug("Trying to fetch existed payments in range {0}", range);
             
-            var sql =
-                $"SELECT [Id] FROM Tds.Payments WITH (UPDLOCK) WHERE [Id] IN ({range})";
-
+            ctx.SelectWithUpdLock = true;
             long[] existingPayments = await ctx.Set<PaymentEntity>()
-                .FromSqlRaw(sql)
+                .Where(p => range.Contains(p.Id))
                 .AsNoTracking()
                 .Select(p => p.Id)
                 .ToArrayAsync(ct);

@@ -9,6 +9,8 @@ namespace Securrency.TDS.Web.DataLayer
         private readonly DataLayerOptions _options;
         private readonly ILoggerFactory _loggerFactory;
 
+        public bool SelectWithUpdLock { get; set; }
+
         public AppDbContext(IOptions<DataLayerOptions> options, ILoggerFactory loggerFactory)
         {
             _options = options.Value;
@@ -23,6 +25,7 @@ namespace Securrency.TDS.Web.DataLayer
                 options.MigrationsHistoryTable("__EFMigrationsHistory", EntityTypeBuilderExtensions.SchemaName);
             });
             if (_loggerFactory != null) builder.UseLoggerFactory(_loggerFactory);
+            builder.AddInterceptors(new QueryCommandInterceptor());
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

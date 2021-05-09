@@ -8,7 +8,8 @@ namespace Securrency.TDS.Web.DataLayer
         public static void AddDataLayer(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DataLayerOptions>(DataLayerOptions.From(configuration));
-            services.AddDbContext<AppDbContext>(ServiceLifetime.Transient);
+            services.AddDbContext<AppDbContext>(o => 
+                o.AddInterceptors(new QueryCommandInterceptor()), ServiceLifetime.Transient);
             services.AddSingleton<IDbContextFactory, DbContextFactory>();
         }
     }

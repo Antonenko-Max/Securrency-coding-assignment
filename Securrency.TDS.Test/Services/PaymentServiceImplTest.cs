@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -38,21 +37,43 @@ namespace Securrency.TDS.Test.Services
                 "{\"id\": \"3531317815820289\",\r\n\"transaction_successful\": true,\r\n\"source_account\": \"GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT\",\r\n\"type\": \"payment\",\r\n\"type_i\": 1,\r\n\"created_at\": \"2021-05-06T09:42:47Z\",\r\n\"transaction_hash\": \"20e99c23d970947fc020f90e9063d6edf92a7736f2c5cab77b64a5c5d9823f8f\",\r\n\"asset_type\": \"native\",\r\n\"from\": \"GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT\",\r\n\"to\": \"GCYY337UP2VNQTJ4AZTO2K54HK5V5RARB6BDFQXLFVZMEKFPTZTWBJQP\",\r\n\"amount\": \"10.0000000\"\r\n}";
             var jsonResponse2 =
                 "{\"id\": \"3531317815820290\",\r\n\"transaction_successful\": true,\r\n\"source_account\": \"GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT\",\r\n\"type\": \"payment\",\r\n\"type_i\": 1,\r\n\"created_at\": \"2021-05-06T09:42:47Z\",\r\n\"transaction_hash\": \"20e99c23d970947fc020f90e9063d6edf92a7736f2c5cab77b64a5c5d9823f8f\",\r\n\"asset_type\": \"native\",\r\n\"from\": \"GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT\",\r\n\"to\": \"GCYY337UP2VNQTJ4AZTO2K54HK5V5RARB6BDFQXLFVZMEKFPTZTWBJQP\",\r\n\"amount\": \"10.0000000\"\r\n}";
+            var jsonResponse3 =
+                "{\"id\": \"3531317815820291\",\r\n\"transaction_successful\": true,\r\n\"source_account\": \"GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT\",\r\n\"type\": \"payment\",\r\n\"type_i\": 1,\r\n\"created_at\": \"2021-05-06T09:42:47Z\",\r\n\"transaction_hash\": \"20e99c23d970947fc020f90e9063d6edf92a7736f2c5cab77b64a5c5d9823f8f\",\r\n\"asset_type\": \"native\",\r\n\"from\": \"GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT\",\r\n\"to\": \"GCYY337UP2VNQTJ4AZTO2K54HK5V5RARB6BDFQXLFVZMEKFPTZTWBJQP\",\r\n\"amount\": \"10.0000000\"\r\n}";
+            var jsonResponse4 =
+                "{\"id\": \"3531317815820292\",\r\n\"transaction_successful\": true,\r\n\"source_account\": \"GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT\",\r\n\"type\": \"payment\",\r\n\"type_i\": 1,\r\n\"created_at\": \"2021-05-06T09:42:47Z\",\r\n\"transaction_hash\": \"20e99c23d970947fc020f90e9063d6edf92a7736f2c5cab77b64a5c5d9823f8f\",\r\n\"asset_type\": \"native\",\r\n\"from\": \"GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT\",\r\n\"to\": \"GCYY337UP2VNQTJ4AZTO2K54HK5V5RARB6BDFQXLFVZMEKFPTZTWBJQP\",\r\n\"amount\": \"10.0000000\"\r\n}";
 
             var deserializer = new OperationDeserializer();
             OperationResponse response1 = deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse1)),
                 typeof(PaymentOperationResponse), null, false, new JsonSerializer());
             OperationResponse response2 = deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse2)),
                 typeof(PaymentOperationResponse), null, false, new JsonSerializer());
+            OperationResponse response3 = deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse3)),
+                typeof(PaymentOperationResponse), null, false, new JsonSerializer());
+            OperationResponse response4= deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse4)),
+                typeof(PaymentOperationResponse), null, false, new JsonSerializer());
 
-            WalletPostModel[] wallets = Array.Empty<WalletPostModel>();
+            var wallets = new WalletPostModel[]
+            {
+                new() {AccountId = "GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT"},
+                new() {AccountId = "GCYY337UP2VNQTJ4AZTO2K54HK5V5RARB6BDFQXLFVZMEKFPTZTWBJQP"}
+            };
             var operations = new List<OperationResponse>[]
             {
-                new() {response1, response2}
+                new() {response1, response2},
+                new() {response3, response4}
             };
 
             PaymentEntity payment1 = ((PaymentOperationResponse)response1).ToEntity();
             PaymentEntity payment2 = ((PaymentOperationResponse)response2).ToEntity();
+            PaymentEntity payment3 = ((PaymentOperationResponse)response1).ToEntity();
+            PaymentEntity payment4 = ((PaymentOperationResponse)response2).ToEntity();
+
+            using (AppDbContext ctx1 = Db.GetAdminContext())
+            {
+                ctx1.Set<PaymentEntity>().Add(payment3);
+                ctx1.Set<PaymentEntity>().Add(payment4);
+                await ctx1.SaveChangesAsync();
+            }
 
             _mock.Mock<IStellarClient>()
                 .Setup(s => s.GetPaymentsInNativeAssetAsync(wallets, CancellationToken.None))
@@ -94,7 +115,8 @@ namespace Securrency.TDS.Test.Services
             var deserializer = new OperationDeserializer();
             OperationResponse response1 = deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse1)), typeof(PaymentOperationResponse), null, false, new JsonSerializer());
 
-            WalletPostModel[] wallets = Array.Empty<WalletPostModel>();
+            var wallets = new WalletPostModel[]
+                {new() {AccountId = "GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT"}};
             var operations = new List<OperationResponse>[]
             {
                 new() {response1},
@@ -135,7 +157,8 @@ namespace Securrency.TDS.Test.Services
             OperationResponse response1 = deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse1)), typeof(PaymentOperationResponse), null, false, new JsonSerializer());
             OperationResponse response2 = deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse2)), typeof(PaymentOperationResponse), null, false, new JsonSerializer());
 
-            WalletPostModel[] wallets = Array.Empty<WalletPostModel>();
+            var wallets = new WalletPostModel[]
+                {new() {AccountId = "GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT"}};
             var operations = new List<OperationResponse>[]
             {
                 new() {response1},
@@ -170,7 +193,8 @@ namespace Securrency.TDS.Test.Services
             OperationResponse response1 = deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse1)),
                 typeof(PaymentOperationResponse), null, false, new JsonSerializer());
 
-            WalletPostModel[] wallets = Array.Empty<WalletPostModel>();
+            var wallets = new WalletPostModel[]
+                {new() {AccountId = "GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR"}};
             var operations = new List<OperationResponse>[]
             {
                 new() {response1}
@@ -202,7 +226,8 @@ namespace Securrency.TDS.Test.Services
             OperationResponse response1 = deserializer.ReadJson(new JsonTextReader(new StringReader(jsonResponse1)),
                 typeof(PaymentOperationResponse), null, false, new JsonSerializer());
 
-            WalletPostModel[] wallets = Array.Empty<WalletPostModel>();
+            var wallets = new WalletPostModel[]
+                {new() {AccountId = "GCPWZSMOLI7SWZWQYILSPZIPJMB3ZOR5JNB6DH2OPAPLPAD2BHMRP2VT"}};
             var operations = new List<OperationResponse>[]
             {
                 new() {response1}
